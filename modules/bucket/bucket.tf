@@ -46,9 +46,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     id     = "infrequent-access"
     status = "Enabled"
 
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+
+    expiration {
+      expired_object_delete_marker = true
+    }
+
+    noncurrent_version_expiration {
+      newer_noncurrent_versions = 3
+      noncurrent_days           = 7
     }
   }
 }

@@ -13,7 +13,7 @@ locals {
       Statement = [
         merge(
           {
-            "Sid" : "AllowGroupToSeeBucketListInTheConsole",
+            "Sid" : "AllowListMyBuckets",
             "Action" : [
               "s3:ListAllMyBuckets"
             ],
@@ -31,7 +31,7 @@ locals {
             Action = [
               "s3:ListBucket"
             ]
-            Resource = [aws_s3_bucket.this.arn]
+            Resource = [var.bucket_arn]
           },
           local.allowed_ips_condition
         ),
@@ -39,12 +39,14 @@ locals {
           {
             Sid    = "AllowObjectActions"
             Effect = "Allow"
-            Action = [
+            Action = var.rw ? [
               "s3:GetObject",
               "s3:PutObject",
               "s3:DeleteObject"
+              ] : [
+              "s3:GetObject",
             ]
-            Resource = ["${aws_s3_bucket.this.arn}/*"]
+            Resource = ["${var.bucket_arn}/*"]
           },
           local.allowed_ips_condition
         )
@@ -53,8 +55,14 @@ locals {
   )
 }
 
+resource "random_string" "name_suffix" {
+  length  = 16
+  upper   = false
+  special = false
+}
+
 resource "aws_iam_user" "this" {
-  name = "bucket-user-${aws_s3_bucket.this.id}"
+  name = "${var.name_prefix}-${var.rw ? "rw" : "ro"}-${random_string.name_suffix.result}"
 }
 
 resource "aws_iam_user_policy" "this" {
