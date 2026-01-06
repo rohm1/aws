@@ -8,6 +8,7 @@ variable "bucket_arn" {
 
 variable "rw" {
   description = "Whether to apply RW (read-write) or RO (read-only) permissions to the user"
+  type        = bool
 }
 
 variable "allowed_ips" {
