@@ -1,5 +1,9 @@
 resource "aws_s3_bucket" "this" {
-  bucket_prefix = var.bucket_prefix
+  bucket_prefix = "${var.bucket_prefix}-"
+
+  tags = {
+    Name = var.bucket_prefix
+  }
 }
 
 resource "aws_s3_bucket_ownership_controls" "ownership_controls" {
